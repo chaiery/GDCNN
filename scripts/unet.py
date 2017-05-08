@@ -31,27 +31,27 @@ def network(input_var, label_var, shape):
     #convolution layers (32 filters)
     #nonlinearality = nn.nonlinearities.rectify <-- ReLu
     layer = nn.layers.Conv2DLayer(layer, num_filters = 64,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #114
+                                  nonlinearity = nn.nonlinearities.rectify) #112
                                   
     # max pool layer (stride = 2)
     layer = nn.layers.MaxPool2DLayer(layer, pool_size = 2) #56 (half of previous layer)
     
     #convolution layers (64 filters)
     layer = nn.layers.Conv2DLayer(layer, num_filters = 128,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #54
+                                  nonlinearity = nn.nonlinearities.rectify) #52
 
                                   
     # max pool layer
     layer = nn.layers.MaxPool2DLayer(layer, pool_size = 2) #26 (half of previous layer)
     
     #convolution layers (256 filters)
-    layer = nn.layers.Conv2DLayer(layer, num_filters = 128,filter_size = 3,
-                                  nonlinearity = nn.nonlinearities.rectify) #24
+    layer = nn.layers.Conv2DLayer(layer, num_filters = 128,filter_size = 5,
+                                  nonlinearity = nn.nonlinearities.rectify) #22
                                      
                                     
     #convolutional layers with 'full' pad
-    layer = nn.layers.Conv2DLayer(layer, num_filters = 128,filter_size = 3,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #26 = 24 -2 +2 +2
+    layer = nn.layers.Conv2DLayer(layer, num_filters = 128,filter_size = 5,
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #26
 
     
     #upscale layer
@@ -59,10 +59,10 @@ def network(input_var, label_var, shape):
     
     #convolutional layers with 'full' pad
     layer = nn.layers.Conv2DLayer(layer, num_filters = 128,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #54
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #56
                                   
     #upscale layer
-    layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #112 =140 * 2
+    layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #112
     
     #convolutional layers with 'full' pad
     
