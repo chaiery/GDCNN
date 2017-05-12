@@ -1,6 +1,6 @@
  # training implementation of unet.py
 import theano
-import lasagne
+import lasagne_dev as nn
 import random
 import numpy as np
 import scipy.ndimage.interpolation
@@ -9,6 +9,9 @@ import imp
 from theano import tensor as T
 import unet
 import elastic_transform_square as elastic
+from collections import OrderedDict
+from g_gradient import *
+
 
 batch = 5 #16 images fed in each time
 max_rotation = 30 #must be intuitive
@@ -83,10 +86,29 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
 
     [network, loss, test_loss, test_acc, output_det] = unet.network(input_var, label_var, [batch,1,shape[2],shape[3]])
 
-    params = lasagne.layers.get_all_params(network)
-    lr = theano.shared(lasagne.utils.floatX(1e-4)) # learning rate
-    updates = lasagne.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
-    #updates = lasagne.updates.momentum(loss,params, learning_rate=lr,momentum=0.99)
+    params = nn.layers.get_all_params(network)
+    lr = theano.shared(nn.utils.floatX(1e-4)) # learning rate
+    updates = nn.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
+    #updates = nn.updates.momentum(loss,params, learning_rate=lr,momentum=0.99)
+    gs = nn.layers.get_all_gs(network)
+    gs_updates = g_updates(loss, params, gs)
+    value = [gs_updates[gs[i]].eval() for i in range (0,len(gs))]
+
+    value = [gs[i].eval() for i in range(0,len(gs))]
+    nn.layers.set_all_gs_values(network, value)
+
+    ## generate updates for params
+    updates = OrderedDict()
+    updates_old = nn.updates.adam(loss, params, learning_rate=lr)
+    for i in range (0,len(value)):
+        gs = value[i]
+        ws = params[i*2]
+        [num_filters, num_channels, filter_size, filter_size] = np.ndarray.tolist(ws.shape.eval())
+        W = nn.layers.gabor.gabor_filter_initiation([num_filters, num_channels, filter_size, filter_size], gs)
+        #updates[ws] = theano.shared(W)
+        updates[ws] = W
+        updates[params[i*2+1]] = updates_old[params[i*2+1]]
+
 
     train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
     test_fn = theano.function([input_var, label_var], test_loss, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
@@ -110,7 +132,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         if test_err < best_test_err:
             best_test_err = test_err
             best_epoch = epoch
-            best = [np.copy(p) for p in (lasagne.layers.get_all_param_values(network))]
+            best = [np.copy(p) for p in (nn.layers.get_all_param_values(network))]
             
         if epoch%10 == 0:
             params_file='params_epoch_'+str(epoch)
