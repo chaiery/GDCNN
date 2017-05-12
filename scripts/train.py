@@ -85,7 +85,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
 
     params = lasagne.layers.get_all_params(network)
     lr = theano.shared(lasagne.utils.floatX(1e-4)) # learning rate
-    updates = lasagne.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
+    updates = lasagne.updates.sgd(loss,params, learning_rate=lr) # adam most widely used update scheme
     #updates = lasagne.updates.momentum(loss,params, learning_rate=lr,momentum=0.99)
 
     train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
@@ -101,7 +101,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     log_file = 'log.txt'
     f = open(log_file, 'w')
 
-    while (epoch < 501):
+    while (epoch < 101):
         train_err = run_epoch(train_input_new, train_label_new, train_fn, shape)
         test_err = run_epoch(test_input_var, test_label_var, test_fn, test_shape)
         print(test_err,train_err)
@@ -112,7 +112,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
             best_epoch = epoch
             best = [np.copy(p) for p in (lasagne.layers.get_all_param_values(network))]
             
-        if epoch%10 == 0:
+        if epoch%50 == 0:
             params_file='params_epoch_'+str(epoch)
             with open(params_file, 'wb') as wr:
                 pickle.dump(best, wr)
