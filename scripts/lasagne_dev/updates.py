@@ -868,3 +868,5 @@ def adam_dev(gradient, params, learning_rate=0.001, beta1=0.9,
 
     updates[t_prev] = t
     return updates
+
+

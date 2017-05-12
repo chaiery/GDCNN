@@ -120,6 +120,8 @@ class Layer(object):
         else:
             return result
 
+
+
     def get_output_shape_for(self, input_shape):
         """
         Computes the output shape of this layer, given an input shape.
