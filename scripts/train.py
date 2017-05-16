@@ -92,11 +92,12 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     updates = nn.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
     #updates = nn.updates.momentum(loss,params, learning_rate=lr,momentum=0.99)
     gs = nn.layers.get_all_gs(network)
-    gs_updates = g_updates(loss, params, gs)
-    value = [gs_updates[gs[i]].eval() for i in range (0,len(gs))]
 
-    value = [gs[i].eval() for i in range(0,len(gs))]
-    nn.layers.set_all_gs_values(network, value)
+    gs_updates = g_updates(loss, params, gs)
+    value = [gs_updates[gs[i]].get_value() for i in range (0,len(gs))]
+
+    #value = [gs[i].get_value() for i in range(0,len(gs))]
+    #nn.layers.set_all_gs_values(network, value)
 
     ## generate updates for params
     updates = OrderedDict()
@@ -104,7 +105,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     for i in range (0,len(value)):
         gs = value[i]
         ws = params[i*2]
-        [num_filters, num_channels, filter_size, filter_size] = np.ndarray.tolist(ws.shape.eval())
+        [num_filters, num_channels, filter_size, filter_size] = ws.get_value().shape
         W = nn.layers.gabor.gabor_filter_initiation([num_filters, num_channels, filter_size, filter_size], gs)
         #updates[ws] = theano.shared(W)
         updates[ws] = W

@@ -67,6 +67,7 @@ def g_updates(loss, params, gs):
 
 	for w_index in range (0, int(len(params)/2)):
 		# First Loop
+		# print(w_index)
 		ws = params[w_index*2]
 		g_params = gs[w_index]	
 		ws_gradients = gradients[w_index*2]
@@ -82,8 +83,8 @@ def g_updates(loss, params, gs):
 				w = ws[i,j,:,:]
 
 				w_gradient = ws_gradients[i,j,:]
-
-				addition = gabor_filter_update(filter_size, g.eval(), g_psi)	# need adjustment
+				
+				#addition = gabor_filter_update(filter_size, g.eval(), g_psi)	# need adjustment
 
 				'''
 				a = (w_gradient*addition).sum()
@@ -92,8 +93,8 @@ def g_updates(loss, params, gs):
 				g_gradients = np.concatenate((g_gradients,g_gradient),axis=1)
 				'''
 				#a = sum(sum(w_gradient*addition))
-				a = (w_gradient*addition).sum()
-				psi_gradient = a/9
+				#a = (w_gradient*addition).sum()
+				#psi_gradient = a/9
 				g_gradient = np.array([0,0,0,0,0]).reshape(1,-1)
 				#g_gradient = np.array([0,0,0,0,psi_gradient]).reshape(1,-1)		# need adjustment				
 				g_gradients = np.concatenate((g_gradients,g_gradient),axis=1)
