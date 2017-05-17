@@ -116,7 +116,7 @@ def gabor_weight_update(shape, gs):
                 gfilter.append(value)
             
     Ws = theano.tensor.stack(gfilter)
-    Ws = W.reshape(shape)
+    Ws = Ws.reshape(shape)
             #W = np.array(gfilter, dtype=np.float32)
             #W = np.array(gfilter)
             #W = W.reshape(1,-1)
