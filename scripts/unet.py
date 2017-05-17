@@ -37,29 +37,29 @@ def network(input_var, label_var, shape):
     layer = nn.layers.MaxPool2DLayer(layer, pool_size = 2) #56 (half of previous layer)
     
     #convolution layers (64 filters)
-    layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #52
+    #layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
+    #                              nonlinearity = nn.nonlinearities.rectify) #52
 
                                   
     # max pool layer
     layer = nn.layers.MaxPool2DLayer(layer, pool_size = 2) #26 (half of previous layer)
     
     #convolution layers (256 filters)
-    layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #22
+    #layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
+    #                              nonlinearity = nn.nonlinearities.rectify) #22
                                      
                                     
     #convolutional layers with 'full' pad
-    layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #26
+    #layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
+    #                              nonlinearity = nn.nonlinearities.rectify, pad = 'full') #26
 
     
     #upscale layer
     layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #52
     
     #convolutional layers with 'full' pad
-    layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #56
+    #layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 128,filter_size = 5,
+    #                              nonlinearity = nn.nonlinearities.rectify, pad = 'full') #56
                                   
     #upscale layer
     layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #112

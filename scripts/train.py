@@ -90,23 +90,21 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     params = nn.layers.get_all_params(network)
     lr = theano.shared(nn.utils.floatX(1e-4)) # learning rate
     updates = nn.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
-    #updates = nn.updates.momentum(loss,params, learning_rate=lr,momentum=0.99)
+
     gs = nn.layers.get_all_gs(network)
 
     gs_updates = g_updates(loss, params, gs)
-    value = [gs_updates[gs[i]].get_value() for i in range (0,len(gs))]
-
-    #value = [gs[i].get_value() for i in range(0,len(gs))]
-    #nn.layers.set_all_gs_values(network, value)
+    #value = [gs_updates[gs[i]].get_value() for i in range (0,len(gs))]
 
     ## generate updates for params
     updates = OrderedDict()
     updates_old = nn.updates.adam(loss, params, learning_rate=lr)
-    for i in range (0,len(value)):
-        gs = value[i]
+    for i in range (0,len(gs)):
+        print i
+        gs_new = gs_updates[gs[0]]
         ws = params[i*2]
         [num_filters, num_channels, filter_size, filter_size] = ws.get_value().shape
-        W = nn.layers.gabor.gabor_filter_initiation([num_filters, num_channels, filter_size, filter_size], gs)
+        W = gabor_weight_update([num_filters, num_channels, filter_size, filter_size], gs_new)
         #updates[ws] = theano.shared(W)
         updates[ws] = W
         updates[params[i*2+1]] = updates_old[params[i*2+1]]

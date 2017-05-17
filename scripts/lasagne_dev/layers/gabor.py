@@ -23,8 +23,8 @@ def gabor_filter(x,y,params):
     xt = x*math.cos(theta) + y*math.sin(theta)
     yt = -x*math.sin(theta) + y*math.cos(theta)
     z1 = -(xt**2 + (gamma*yt)**2)/(2*sigma**2)
-    z2 = 1j*2*math.pi*f*xt+psi
-    value = f**2/(math.pi*gamma)*math.exp(z1)*cmath.exp(z2)
+    z2 = 2*math.pi*f*xt+psi
+    value = f**2/(math.pi*gamma)*math.exp(z1)*math.cos(z2)
     return value
 
 
@@ -35,6 +35,7 @@ def gabor_filter_initiation(shape, gs):
         for filter_index in range (0,NumFilter):
             params = gs[filter_index, channel_index]
             params = np.ndarray.tolist(params)
+
         
             bond = math.floor(size/2)
             x_range = np.linspace(-bond, bond, size)
@@ -44,7 +45,7 @@ def gabor_filter_initiation(shape, gs):
             gfilter = []
             for (x,y) in zip(np.ndarray.tolist(x_range)[0], np.ndarray.tolist(y_range)[0]):
                 value = gabor_filter(x,y,params)
-                gfilter.append(value.real)
+                gfilter.append(value)
             
             W = np.array(gfilter, dtype=np.float32)
             W = W.reshape(1,-1)
