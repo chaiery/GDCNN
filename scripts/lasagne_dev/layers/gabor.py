@@ -31,12 +31,11 @@ def gabor_filter(x,y,params):
 def gabor_filter_initiation(shape, gs):
     [NumFilter,NumChannel,size,size] = shape
     Ws = np.array([], dtype=np.float32).reshape(1,-1)
-    for channel_index in range (0,NumChannel):
-        for filter_index in range (0,NumFilter):
+    for filter_index in range (0,NumFilter):
+        for channel_index in range (0,NumChannel):
             params = gs[filter_index, channel_index]
             params = np.ndarray.tolist(params)
 
-        
             bond = math.floor(size/2)
             x_range = np.linspace(-bond, bond, size)
             y_range = np.linspace(-bond, bond, size)

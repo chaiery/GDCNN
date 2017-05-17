@@ -94,10 +94,13 @@ def g_updates(loss, params, gs):
 
 
 def gabor_weight_update(shape, gs):
-    [NumFilter,NumChannel,size,size] = shape
-    Ws = np.array([], dtype=np.float32).reshape(1,-1)
-    for channel_index in range (0,NumChannel):
-        for filter_index in range (0,NumFilter):
+    [num_filters,num_channels,size,size] = shape
+    #Ws = np.array([], dtype=np.float32).reshape(1,-1)
+
+    gfilter = []
+
+    for filter_index in range (0,num_filters):
+        for channel_index in range (0,num_channels):
             params = gs[filter_index, channel_index]
             g_params = [params[0],params[1],params[2],params[3],params[4]]
 
@@ -107,16 +110,17 @@ def gabor_weight_update(shape, gs):
             y_range = np.linspace(-bond, bond, size)
 
             [x_range,y_range] = list(map(lambda x:x.reshape(1,-1),np.meshgrid(x_range,y_range)))
-            gfilter = []
+            
             for (x,y) in zip(np.ndarray.tolist(x_range)[0], np.ndarray.tolist(y_range)[0]):
                 value = gabor_filter_tensor(x,y,g_params)
                 gfilter.append(value)
             
+    Ws = theano.tensor.stack(gfilter)
+    Ws = W.reshape(shape)
             #W = np.array(gfilter, dtype=np.float32)
-            W = np.array(gfilter)
-            W = W.reshape(1,-1)
-            Ws = np.concatenate((Ws,W),axis=1)
-    Ws = Ws.reshape(shape)
+            #W = np.array(gfilter)
+            #W = W.reshape(1,-1)
+            #Ws = np.concatenate((Ws,W),axis=1)
     return Ws
 
 
