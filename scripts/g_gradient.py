@@ -86,7 +86,7 @@ def g_updates(loss, params, gs):
                 g = g_params[i,j,:]
                 additions.append(g_psi(0,0,g))
                 
-        additions =  np.array(additions).reshape(num_filters,num_channels,-1)
+        additions =  np.array(additions,dtype=np.float32).reshape(num_filters,num_channels,-1)
         g_gradients = theano.tensor.concatenate([ws_grad*0, ws_grad*0, ws_grad*0, ws_grad*0, ws_grad*0], axis=2)*additions
         gs_gradients.append(g_gradients)
     gs_updates = nn.updates.adam_dev(gs_gradients, gs)
