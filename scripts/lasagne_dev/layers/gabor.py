@@ -55,7 +55,7 @@ def gabor_filter_initiation(shape, gs):
 
 def random_gabor(shape):
     [NumFilter, NumChannel] = shape
-    gs = np.array([]).reshape(1,-1)
+    gs = np.array([],dtype=np.float32).reshape(1,-1)
 
     for i in range (0,NumChannel*NumFilter):
         f = random.uniform(0.0001,2)
@@ -66,7 +66,7 @@ def random_gabor(shape):
         
         params = [f, gamma, sigma, theta, psi]
         
-        g = np.array(params).reshape(1,-1)
+        g = np.array(params, dtype=np.float32).reshape(1,-1)
         gs = np.concatenate((gs,g),axis=1)
     gs = gs.reshape([NumFilter, NumChannel, 5])
     return gs  
