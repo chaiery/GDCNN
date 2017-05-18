@@ -76,7 +76,7 @@ def g_updates(loss, params, gs):
 
         [num_filters, num_channels, filter_size, filter_size] = ws.get_value().shape
         
-        position = filter_size/2
+        position = math.floor(filter_size/2)
         ws_grad = gradients[0][:,:,position:position+1,position]
 
         # Second and third Loop
