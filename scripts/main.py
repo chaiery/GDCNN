@@ -20,7 +20,7 @@ train_index = index[0:4000]
 test_index = fnames[4000:4200]
 '''
 train_index = fnames[0:5]
-test_index = fnames[10:15]
+test_index = fnames[0:5]
 
 
 

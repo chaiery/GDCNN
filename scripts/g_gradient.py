@@ -61,7 +61,7 @@ def g_psi(x,y,params):
     return value
 
 
-def g_updates(loss, params, gs):
+def g_updates(loss, params, gs, lr=0.001):
     # Calculate gradients: 0.05
     gs_gradients = []
     gradients = nn.updates.get_or_compute_grads(loss, params)
@@ -77,7 +77,7 @@ def g_updates(loss, params, gs):
         [num_filters, num_channels, filter_size, filter_size] = ws.get_value().shape
         
         position = int(math.floor(filter_size/2))
-        ws_grad = gradients[0][:,:,position:position+1,position]
+        ws_grad = ws_gradients[:,:,position:position+1,position]
 
         # Second and third Loop
         additions = []
@@ -87,15 +87,42 @@ def g_updates(loss, params, gs):
                 additions.append(g_psi(0,0,g))
                 
         additions =  np.array(additions,dtype=np.float32).reshape(num_filters,num_channels,-1)
-        g_gradients = theano.tensor.concatenate([ws_grad*0, ws_grad*0, ws_grad*0, ws_grad*0, ws_grad*0], axis=2)*additions
+        g_gradients = theano.tensor.concatenate([ws_grad*0, ws_grad*0, ws_grad*0, ws_grad*0, ws_grad], axis=2)*additions
         gs_gradients.append(g_gradients)
-    gs_updates = nn.updates.adam_dev(gs_gradients, gs)
+    gs_updates = nn.updates.adam_dev(gs_gradients, gs, learning_rate=lr)
     return gs_updates
 
 
 def gabor_weight_update(shape, gs):
     [num_filters,num_channels,size,size] = shape
     #Ws = np.array([], dtype=np.float32).reshape(1,-1)
+    Ws = []
+    gfilter = []
+
+    for filter_index in range (0,num_filters):
+        for channel_index in range (0,num_channels):
+            
+            params = gs[filter_index, channel_index]
+            g_params = [params[0],params[1],params[2],params[3],params[4]]
+            
+            bond = math.floor(size/2)
+            x_range = np.linspace(-bond, bond, size)
+            y_range = np.linspace(-bond, bond, size)
+
+            xt,yt = np.meshgrid(x_range,y_range)
+            xt = xt.astype(np.float32)
+            yt = yt.astype(np.float32)
+            a = gabor_filter_tensor(xt,yt,g_params)
+            gfilter.append(a)
+    Ws = theano.tensor.stack(gfilter)
+    Ws = Ws.reshape(shape)
+    return Ws
+
+
+
+'''
+def gabor_weight_update(shape, gs):
+    [num_filters,num_channels,size,size] = shape
 
     gfilter = []
 
@@ -117,15 +144,10 @@ def gabor_weight_update(shape, gs):
             
     Ws = theano.tensor.stack(gfilter)
     Ws = Ws.reshape(shape)
-            #W = np.array(gfilter, dtype=np.float32)
-            #W = np.array(gfilter)
-            #W = W.reshape(1,-1)
-            #Ws = np.concatenate((Ws,W),axis=1)
     return Ws
 
 
 
-'''
 def g_updates_dev(loss, params, gs):
     # Calculate gradients: 0.05
     gs_gradients = []
