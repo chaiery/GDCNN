@@ -13,14 +13,11 @@ for i in range (0,len(fnames)):
 	fnames[i] = str(fnames[i])
 	fnames[i] = 'image' + fnames[i] + '.png'
 
-'''
+
 index = fnames[1:4000]
 random.shuffle(index)
 train_index = index[0:4000]
-test_index = fnames[4000:4200]
-'''
-train_index = fnames[0:5]
-test_index = fnames[0:5]
+test_index = fnames[4000:4060]
 
 
 

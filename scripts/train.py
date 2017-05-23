@@ -13,7 +13,7 @@ from collections import OrderedDict
 from g_gradient import *
 import timeit
 
-batch = 5 #16 images fed in each time
+batch = 20 #16 images fed in each time
 max_rotation = 30 #must be intuitive
 max_shift = 20 #must be relevant to total size (1/10 is good)
 
@@ -23,11 +23,6 @@ def run_epoch(input_var, label_var, fn, shape):
     i = 0
     err = 0
 
-    tmp_input = input_var
-    tmp_label = label_var
-
-    err = fn(tmp_input, tmp_label)
-    '''
     while (i<count):
         start = i*batch
         tmp_input = input_var[i*batch:(i+1)*batch]
@@ -40,7 +35,7 @@ def run_epoch(input_var, label_var, fn, shape):
         pass
 
     err = err/count #normalize error
-    '''
+    
     return err
 
 
@@ -71,7 +66,7 @@ def image_transform(input_var, label_var, shape):
 
         
         #elastic_transform
-        img, label = elastic.elastic_transform(img, label, 10, 2, random_state=None)
+        #img, label = elastic.elastic_transform(img, label, 10, 2, random_state=None)
         
         img = img.reshape(1,shape[2],shape[3]) #reshape the image to original size afer shift
         label = label.reshape(1,shape[2],shape[3]) #reshape the image to original size afer shift
@@ -95,7 +90,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
 
     params = nn.layers.get_all_params(network)
     lr = theano.shared(nn.utils.floatX(1e-4)) # learning rate
-    lr_g = theano.shared(nn.utils.floatX(1e-3))
+    lr_g = theano.shared(nn.utils.floatX(1e-4))
     updates = nn.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
 
     gs = nn.layers.get_all_gs(network)
@@ -117,10 +112,15 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         updates[params[i*2+1]] = updates_old[params[i*2+1]]
         updates[gs[i]] = gs_new
 
-
+    start = timeit.default_timer()
     train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
-    test_fn = theano.function([input_var, label_var], test_loss, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
+    stop = timeit.default_timer()
+    print(stop-start)
 
+    start = timeit.default_timer()
+    test_fn = theano.function([input_var, label_var], test_loss, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
+    stop = timeit.default_timer()
+    print(stop-start)
 
     best = None
     best_test_err = 10000
@@ -144,14 +144,14 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
             best_test_err = test_err
             best_epoch = epoch
             best = [np.copy(p) for p in (nn.layers.get_all_param_values(network))]
-            
+        '''
         if epoch%50 == 0:
             params_file='params_epoch_'+str(epoch)
             with open(params_file, 'wb') as wr:
                 pickle.dump(best, wr)
                 pass
             wr.close()
-
+	'''
         print('%d epoch finished' %(epoch))
         epoch = epoch+1
 
