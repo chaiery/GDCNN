@@ -30,17 +30,61 @@ def gabor_filter_tensor(x,y,params):
     value = f**2/(math.pi*gamma)*theano.tensor.exp(z1)*theano.tensor.cos(z2)
     return value
 
-'''
+
 def g_theta(x,y,params):
-    f,gamma,sigma,theta,psi = params
-    value = gabor_filter(x,y,params)
-    return ((yt*xt/sigma**2)*(gamma**2-1)+1j*2*math.pi*f*yt)*value
+    return 0
 
 
 def g_f(x,y,params):
     f,gamma,sigma,theta,psi = params
-    value = gabor_filter(x,y,params)  
-    return (2/f + 1j*2*math.pi*xt)*value
+    z1 = 0
+    z2 = psi
+    value_1 = 2*f/(math.pi*gamma)*math.exp(z1)*math.cos(z2)
+    return value_1
+
+
+def g_gamma(x,y,params):
+    f,gamma,sigma,theta,psi = params
+    value = gabor_filter_dev(x,y,params)  
+    return -(1/gamma)*value
+
+
+def g_sigma(x,y,params):
+    f,gamma,sigma,theta,psi = params
+    value = gabor_filter_dev(x,y,params)  
+    return 0
+
+
+def g_psi(x,y,params):
+    f,gamma,sigma,theta,psi = params
+    z1 = 0
+    z2 = psi
+    value = -1*f**2/(math.pi*gamma)*math.exp(z1)*math.sin(z2)
+    return value
+
+
+'''
+def g_theta(x,y,params):
+    f,gamma,sigma,theta,psi = params
+    xt = x*math.cos(theta) + y*math.sin(theta)
+    yt = -x*math.sin(theta) + y*math.cos(theta)
+    z1 = -(xt**2 + (gamma*yt)**2)/(2*sigma**2)
+    z2 = 2*math.pi*f*xt+psi
+    value_1 = (yt*xt/sigma**2)*(gamma**2-1)*f**2/(math.pi*gamma)*math.exp(z1)*math.cos(z2)
+    value_2 = -1*2*math.pi*f*yt*f**2/(math.pi*gamma)*math.exp(z1)*math.sin(z2)
+    return value_1+value_2
+
+
+def g_f(x,y,params):
+    f,gamma,sigma,theta,psi = params
+    xt = x*math.cos(theta) + y*math.sin(theta)
+    yt = -x*math.sin(theta) + y*math.cos(theta)
+    z1 = -(xt**2 + (gamma*yt)**2)/(2*sigma**2)
+    z2 = 2*math.pi*f*xt+psi
+    value_1 = 2*f/(math.pi*gamma)*math.exp(z1)*math.cos(z2)
+    value_2 = -1*2*math.pi*xt*f**2/(math.pi*gamma)*math.exp(z1)*math.sin(z2)
+
+    return value_1+value_2
 
 
 def g_gamma(x,y,params):
@@ -49,16 +93,22 @@ def g_gamma(x,y,params):
     return -(yt**2*gamma/sigma**2+1/gamma)*value
 
 
-def g_theta(x,y,params):
+def g_sigma(x,y,params):
     f,gamma,sigma,theta,psi = params
     value = gabor_filter(x,y,params)  
     return ((xt**2 + gamma**2*yt**2)/sigma**3)*value
-'''
+
 
 def g_psi(x,y,params):
     f,gamma,sigma,theta,psi = params
-    value = gabor_filter_dev(x,y,params)  
+    xt = x*math.cos(theta) + y*math.sin(theta)
+    yt = -x*math.sin(theta) + y*math.cos(theta)
+    z1 = -(xt**2 + (gamma*yt)**2)/(2*sigma**2)
+    z2 = 2*math.pi*f*xt+psi
+    value = -1*f**2/(math.pi*gamma)*math.exp(z1)*math.sin(z2)
     return value
+'''
+
 
 
 def g_updates(loss, params, gs, lr=0.001):

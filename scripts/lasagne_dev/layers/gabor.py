@@ -33,12 +33,12 @@ def random_gabor(shape):
     gs = np.array([],dtype=np.float32).reshape(1,-1)
 
     for i in range (0,NumChannel*NumFilter):
-        f = random.uniform(0.0001,2)
-        gamma = random.uniform(0.0001,1)
-        sigma = random.uniform(0.0001,2)
+        gamma = random.uniform(0.0001,10)
+        sigma = random.uniform(0.0001,5)
         theta = random.uniform(0,2*math.pi)    
-        psi = random.uniform(0.0001,2)
-        
+        psi = random.uniform(0,0.915)
+        f = random.uniform(-7.85398*gamma,7.85398*gamma)
+
         params = [f, gamma, sigma, theta, psi]
         
         g = np.array(params, dtype=np.float32).reshape(1,-1)
