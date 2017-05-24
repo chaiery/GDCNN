@@ -3,7 +3,7 @@ import numpy as np
 import math
 import cmath
 import theano
-
+import random
 
 def gabor_filter(x,y,params):
     f,gamma,sigma,theta,psi = params
@@ -110,7 +110,6 @@ def g_psi(x,y,params):
 '''
 
 
-
 def g_updates(loss, params, gs, lr=0.001):
     # Calculate gradients: 0.05
     gs_gradients = []
@@ -129,15 +128,22 @@ def g_updates(loss, params, gs, lr=0.001):
         position = int(math.floor(filter_size/2))
         ws_grad = ws_gradients[:,:,position:position+1,position]
 
+        # select which parameter to update
+        #rand = random.randint(1,3)
+        rand = 3
+        which_parameter = np.array([[1,0,0,0,0], [0,1,0,0,0], [0,0,0,0,1]][rand-1])
+        fns = [g_f, g_gamma, g_psi]
+        fn = fns[rand-1]
+
         # Second and third Loop
         additions = []
         for i in range (0, num_filters):
             for j in range (0, num_channels):
                 g = g_params[i,j,:]
-                additions.append(g_psi(0,0,g))
+                additions.append(fn(0,0,g))
                 
         additions =  np.array(additions,dtype=np.float32).reshape(num_filters,num_channels,-1)
-        g_gradients = theano.tensor.concatenate([ws_grad*0, ws_grad*0, ws_grad*0, ws_grad*0, ws_grad], axis=2)*additions
+        g_gradients = theano.tensor.concatenate([ws_grad, ws_grad, ws_grad, ws_grad, ws_grad])*which_parameter, axis=2)*additions
         gs_gradients.append(g_gradients)
     gs_updates = nn.updates.adam_dev(gs_gradients, gs, learning_rate=lr)
     return gs_updates
