@@ -94,7 +94,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     
     if epoch ==1:
         lr_g = theano.shared(nn.utils.floatX(1e-4))
-    #if epoch%5 == 0:
+    if epoch%5 == 0:
         #lr_g = theano.shared(nn.utils.floatX(lr_g/epoch))
     #updates = nn.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
 
