@@ -151,8 +151,8 @@ def g_updates(loss, params, gs, rand, lr=0.001):
         for i in range (0, num_filters):
             for j in range (0, num_channels):
                 g = g_params[i,j,:]
-                #additions.append(fn(0,0,g))
-                additions.append(calculate_gradient_for_g(fn,g,filter_size))
+                additions.append(fn(0,0,g))
+                #additions.append(calculate_gradient_for_g(fn,g,filter_size))
                 
         additions =  np.array(additions,dtype=np.float32).reshape(num_filters,num_channels,-1)
         gp_list = np.array([ws_grad, ws_grad, ws_grad, ws_grad, ws_grad])*which_parameter
