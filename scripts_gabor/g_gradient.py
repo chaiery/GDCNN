@@ -76,7 +76,7 @@ def g_theta(x,y,params):
 
 
 def g_f(x,y,params):
-    f,gamma,sigma,theta,psi = params[0],arams[1],arams[2],arams[3],arams[4],
+    f,gamma,sigma,theta,psi = params[0],params[1],params[2],params[3],params[4],
     xt = x*theano.tensor.cos(theta) + y*theano.tensor.sin(theta)
     yt = -x*theano.tensor.sin(theta) + y*theano.tensor.cos(theta)
     z1 = -(xt**2 + (gamma*yt)**2)/(2*sigma**2)
@@ -151,14 +151,19 @@ def g_updates(loss, params, gs, rand, lr=0.001):
         for i in range (0, num_filters):
             for j in range (0, num_channels):
                 g = g_params[i,j,:]
-                #additions.append(fn(0,0,g))
-                additions.append(calculate_gradient_for_g(fn,g,filter_size))
+                additions.append(fn(0,0,g))
+                #additions.append(calculate_gradient_for_g(fn,g,filter_size))
                 
-        additions =  np.array(additions,dtype=np.float32).reshape(num_filters,num_channels,-1)
+        additions = theano.tensor.stack(additions).reshape([num_filters,num_channels,-1])
         gp_list = np.array([ws_grad, ws_grad, ws_grad, ws_grad, ws_grad])*which_parameter
-        g_gradients = theano.tensor.concatenate(np.ndarray.tolist(gp_list), axis=2)*additions
-        gs_gradients.append(g_gradients)
-    gs_updates = nn.updates.adam_dev(gs_gradients, gs, learning_rate=lr)
+        gp = theano.tensor.concatenate(np.ndarray.tolist(gp_list), axis=2)
+        gs_gradient = []
+        for i in range(0,num_filters):
+            for j in range(0,num_channels):
+                gs_gradient.append(gp[i,j,:]*additions[i,j,0])
+
+        gs_gradients.append(theano.tensor.concatenate(gs_gradient, axis=0).reshape([num_filters,num_channels,-1]))
+    gs_updates = nn.updates.sgd_dev(gs_gradients, gs, learning_rate=lr)
     return gs_updates
 
 

@@ -870,3 +870,19 @@ def adam_dev(gradient, params, learning_rate=0.001, beta1=0.9,
     return updates
 
 
+def sgd_dev(grads, params, learning_rate):
+    updates = OrderedDict()
+
+    for param, grad in zip(params, grads):
+        updates[param] = param - learning_rate * grad
+
+    return updates
+
+def momentum_dev(grads, params, learning_rate, momentum=0.9):
+    updates = OrderedDict()
+
+    for param, grad in zip(params, grads):
+        updates[param] = param - learning_rate * grad 
+
+    return apply_momentum(updates, momentum=momentum)
+

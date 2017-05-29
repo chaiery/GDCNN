@@ -116,6 +116,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         updates[ws] = W
         updates[params[i*2+1]] = updates_old[params[i*2+1]]
         updates[gs[i]] = gs_new
+    
 
     start = timeit.default_timer()
     train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need

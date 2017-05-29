@@ -66,7 +66,7 @@ def image_transform(input_var, label_var, shape):
 
         
         #elastic_transform
-        #img, label = elastic.elastic_transform(img, label, 10, 2, random_state=None)
+        img, label = elastic.elastic_transform(img, label, 10, 2, random_state=None)
         
         img = img.reshape(1,shape[2],shape[3]) #reshape the image to original size afer shift
         label = label.reshape(1,shape[2],shape[3]) #reshape the image to original size afer shift
@@ -101,7 +101,6 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     gs = nn.layers.get_all_gs(network)
 
     gs_updates = g_updates(loss, params, gs, rand, lr_g)
-    #value = [gs_updates[gs[i]].get_value() for i in range (0,len(gs))]
 
     ## generate updates for params
     updates = OrderedDict()
@@ -116,6 +115,9 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         updates[ws] = W
         updates[params[i*2+1]] = updates_old[params[i*2+1]]
         updates[gs[i]] = gs_new
+
+    for j in range (2*len(gs),len(params)):
+        updates[params[j]] = updates_old[params[j]]
 
     start = timeit.default_timer()
     train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
