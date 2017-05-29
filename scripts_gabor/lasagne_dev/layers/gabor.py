@@ -47,6 +47,13 @@ def random_gabor(shape):
     return gs  
 
 
+def rescale(gfilter,mag):
+    mi = np.min(gfilter)
+    ma = np.max(gfilter)
+    factor = 0.3/max([ma,-mi])
+    return gfilter*factor
+
+
 def gabor_filter_initiation(shape, gs):
     [num_filters,num_channels,size,size] = shape
     Ws = []
@@ -64,6 +71,7 @@ def gabor_filter_initiation(shape, gs):
 
             xt,yt = np.meshgrid(x_range,y_range)
             a = gabor_filter(xt,yt,params).reshape(1,size,size)
+            a = rescale(a,mag=0.3)
             if len(gfilter)==0:
                 gfilter = a
             else:
