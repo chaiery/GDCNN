@@ -113,7 +113,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         W = gabor_weight_update([num_filters, num_channels, filter_size, filter_size], gs_new)
         #updates[ws] = theano.shared(W)
         updates[ws] = ws
-        updates_old[ws] = ws
+        updates_old[ws] = W
         updates[params[i*2+1]] = updates_old[params[i*2+1]]
         updates[gs[i]] = gs_new
 
@@ -124,7 +124,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         updates_old[gs[j]] = gs_updates[gs[i]]
 
     start = timeit.default_timer()
-    train_fn = theano.function([input_var, label_var], loss, updates=updates_old, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
+    train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
     stop = timeit.default_timer()
     print(stop-start)
 

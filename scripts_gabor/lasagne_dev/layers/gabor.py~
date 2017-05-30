@@ -71,7 +71,7 @@ def gabor_filter_initiation(shape, gs):
 
             xt,yt = np.meshgrid(x_range,y_range)
             a = gabor_filter(xt,yt,params).reshape(1,size,size)
-            #a = rescale(a,mag=0.3)
+            a = rescale(a,mag=0.3)
             if len(gfilter)==0:
                 gfilter = a
             else:
