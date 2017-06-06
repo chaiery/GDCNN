@@ -17,7 +17,11 @@ for i in range (0,len(fnames)):
 index = fnames[1:1000]
 random.shuffle(index)
 train_index = index[0:4000]
+<<<<<<< Updated upstream
 test_index = fnames[4200:4800]
+=======
+test_index = fnames[4200:5000]
+>>>>>>> Stashed changes
 
 
 
