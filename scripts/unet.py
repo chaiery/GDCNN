@@ -31,14 +31,14 @@ def network(input_var, label_var, shape):
     #convolution layers (32 filters)
     #nonlinearality = nn.nonlinearities.rectify <-- ReLu
     layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 8,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #112
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #112
     
     # max pool layer (stride = 2)
     layer = nn.layers.MaxPool2DLayer(layer, pool_size = 2) #56 (half of previous layer)
     
     #convolution layers (64 filters)
     layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 16,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #52
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #52
 
                                       
     # max pool layer
@@ -46,12 +46,12 @@ def network(input_var, label_var, shape):
     
     #convolution layers (256 filters)
     layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 32,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify) #22
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #22
                                      
                                     
     #convolutional layers with 'full' pad
     layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 32,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #26
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #26
 
     
     #upscale layer
@@ -59,7 +59,7 @@ def network(input_var, label_var, shape):
     
     #convolutional layers with 'full' pad
     layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 16,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'full') #56
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #56
                                   
     #upscale layer
     layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #112
@@ -67,7 +67,7 @@ def network(input_var, label_var, shape):
     #convolutional layers with 'full' pad
     
     layer = nn.layers.gabor_Conv2DLayer(layer, num_filters = 1,filter_size = 5,
-                                  nonlinearity = nn.nonlinearities.sigmoid, pad = 'full') #116 
+                                  nonlinearity = nn.nonlinearities.sigmoid, pad = 'same') #116 
 
 
     # this gives the labels for the image that was fed into the nn
