@@ -27,7 +27,7 @@ test_input, test_label= read_images(label_path, ori_path, test_index, size)
 
 
 
-pkl_file = open('params_epoch_27_size7_gabor_1stlayer_0.837', 'rb')
+pkl_file = open('/home/spc/Documents/params_saving/params_epoch_27_gabor7_ast', 'rb')
 params = pickle.load(pkl_file)
 
 input_var = T.tensor4('input_var')   # the data is presented as rasterized images

@@ -95,7 +95,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     lr_g = theano.shared(nn.utils.floatX(1e-10))
     #if epoch%5 == 0
         #lr_g = theano.shared(nn.utils.floatX(lr_g/epoch))
-    updates = nn.updates.adam(loss,params[0:len(params)], learning_rate=lr) # adam most widely used update scheme
+    updates = nn.updates.adam(loss,params[1:len(params)], learning_rate=lr) # adam most widely used update scheme
     '''
     gs = nn.layers.get_all_gs(network)
 
@@ -171,7 +171,7 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
         print('%d epoch finished' %(epoch))
 
         if (epoch-best_epoch)>=10:
-            Dir = '/home/Documents/params_saving/'
+            Dir = '/home/spc/Documents/params_saving/'
             params_file=Dir+'params_epoch_'+str(best_epoch)
             with open(params_file, 'wb') as wr:
                 pickle.dump(best, wr)
