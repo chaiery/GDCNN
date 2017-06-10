@@ -2,6 +2,7 @@ from theano import tensor as T
 import lasagne_dev as nn
 import numpy as np
 import math
+from initiation import *
 # lasagne should be the latest (under development verison)
 # sudo pip install --upgrade https://github.com/Theano/Theano/archive/master.zip
 # sudo pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
@@ -27,11 +28,7 @@ def sorenson_dice(pred, target):
     # add a number at end (20) to avoid dividing by 0
     return -2*T.sum(pred*target)/T.sum(pred+target+0.0001)
 
-def gabor_filter(x,y,n,m):
-    w = (math.pi/2)*(2**0.5)**(-m+1)
-    theta = (n-1)*math.pi/8
-    sigma = math.pi/w
-    
+def gabor_filter(x,y,w,theta,sigma):
     xt = x*np.cos(theta) + y*np.sin(theta)
     yt = -x*np.sin(theta) + y*np.cos(theta)
     
@@ -66,7 +63,11 @@ def gabor32_filter_initiation(shape):
     
     for i in range (1,n+1):
         for j in range (1,m+1):
-            a = gabor_filter(xt,yt,i,j).reshape(1,size,size)
+            w = (math.pi/2)*(2**0.5)**(-j+1)
+            theta = (i-1)*math.pi/8
+            sigma = math.pi/w
+
+            a = gabor_filter(xt,yt,w,theta,sigma).reshape(1,size,size)
             #a = rescale(a,mag=0.3)
             if len(gfilter)==0:
                 gfilter = a

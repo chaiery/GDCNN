@@ -7,7 +7,7 @@ from theano import tensor as T
 import unet
 
 size = (116, 116) 
-pred_path = '../Pred/'
+pred_path = '/home/spc/Dropbox/'
 batch = 1000
 
 pkl_file = open('../fnames_collection_2', 'r')
@@ -27,7 +27,7 @@ test_input, test_label= read_images(label_path, ori_path, test_index, size)
 
 
 
-pkl_file = open('/home/spc/Documents/params_saving/params_epoch_27_gabor7_ast', 'rb')
+pkl_file = open('/home/spc/Documents/params_saving/params_epoch_26_gabor7_fix', 'rb')
 params = pickle.load(pkl_file)
 
 input_var = T.tensor4('input_var')   # the data is presented as rasterized images

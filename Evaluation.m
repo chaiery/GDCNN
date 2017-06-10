@@ -1,5 +1,5 @@
-pred_dir = '/Users/apple/Dropbox/GDCNN/pred_1/';
-label_dir = '/Users/apple/Dropbox/GDCNN/NewPNGlabeled/';
+pred_dir = '/Users/apple/Dropbox/pred/';
+label_dir = '/Users/apple/Dropbox/NewPNGlabeled/';
 ImgFiles = dir(pred_dir);
 ImgFiles = ImgFiles(~strncmpi('.', {ImgFiles.name},1));
 TP = 0; TN = 0; FP = 0; FN = 0; Ps = 0;
