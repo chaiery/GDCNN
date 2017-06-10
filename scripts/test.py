@@ -1,14 +1,14 @@
 from PIL import Image
 import pickle
 from input_process import read_images
-import lasagne as nn
+import lasagne_dev as nn
 import theano
 from theano import tensor as T
 import unet
 
 size = (116, 116) 
-pred_path = '../pred/'
-batch = 10
+pred_path = '../Pred/'
+batch = 1000
 
 pkl_file = open('../fnames_collection_2', 'r')
 fnames = pkl_file.readline()
@@ -18,7 +18,7 @@ for i in range (0,len(fnames)):
 	fnames[i] = 'image' + fnames[i] + '.png'
 
 
-test_index = fnames[4250:5000]
+test_index = fnames[4000:5000]
 
 label_path = '../NewPNGlabeled/'
 ori_path = '../JpegOriginalImg/'
@@ -27,7 +27,7 @@ test_input, test_label= read_images(label_path, ori_path, test_index, size)
 
 
 
-pkl_file = open('previous_50', 'rb')
+pkl_file = open('params_epoch_27_size7_gabor_1stlayer_0.837', 'rb')
 params = pickle.load(pkl_file)
 
 input_var = T.tensor4('input_var')   # the data is presented as rasterized images

@@ -33,11 +33,11 @@ def random_gabor(shape):
     gs = np.array([],dtype=np.float32).reshape(1,-1)
 
     for i in range (0,NumChannel*NumFilter):
-        gamma = random.uniform(0.0001,5)
-        sigma = random.uniform(0.5,2.5)
+        gamma = random.uniform(0.0001,10)
+        sigma = random.uniform(0.0001,5)
         theta = random.uniform(0,2*math.pi)    
-        psi = 0
-        f = random.uniform(0,0.3)
+        psi = random.uniform(0,0.915)
+        f = random.uniform(-7.85398*gamma,7.85398*gamma)
 
         params = [f, gamma, sigma, theta, psi]
         
@@ -45,13 +45,6 @@ def random_gabor(shape):
         gs = np.concatenate((gs,g),axis=1)
     gs = gs.reshape([NumFilter, NumChannel, 5])
     return gs  
-
-
-def rescale(gfilter,mag):
-    mi = np.min(gfilter)
-    ma = np.max(gfilter)
-    factor = 0.3/max([ma,-mi])
-    return gfilter*factor
 
 
 def gabor_filter_initiation(shape, gs):
@@ -71,7 +64,6 @@ def gabor_filter_initiation(shape, gs):
 
             xt,yt = np.meshgrid(x_range,y_range)
             a = gabor_filter(xt,yt,params).reshape(1,size,size)
-            #a = rescale(a,mag=0.3)
             if len(gfilter)==0:
                 gfilter = a
             else:

@@ -40,8 +40,8 @@ def run_epoch(input_var, label_var, fn, shape):
 
 
 def image_transform(input_var, label_var, shape):
-    max_rotation = 30 #must be intuitive
-    max_shift = 20 #must be relevant to total size (1/10 is good)
+    max_rotation = 40 #must be intuitive
+    max_shift = 30 #must be relevant to total size (1/10 is good)
     tmp_input = []
     tmp_label = []
     for start in range (0, input_var.shape[0]):
@@ -58,7 +58,6 @@ def image_transform(input_var, label_var, shape):
         r_shift_y = r*max_shift
         img = scipy.ndimage.interpolation.shift(img, [r_shift_x, r_shift_y])
         
-        
         label = label_var[start,0,:,:]
         label = label.reshape(shape[2],shape[3])
         label = scipy.ndimage.interpolation.rotate(label, r_rotate, reshape=False)
@@ -66,8 +65,8 @@ def image_transform(input_var, label_var, shape):
 
         
         #elastic_transform
-        #img, label = elastic.elastic_transform(img, label, 10, 2, random_state=None)
-        
+        img, label = elastic.elastic_transform(img, label, 10, 2, random_state=None)
+       
         img = img.reshape(1,shape[2],shape[3]) #reshape the image to original size afer shift
         label = label.reshape(1,shape[2],shape[3]) #reshape the image to original size afer shift
         
@@ -92,16 +91,15 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     params = nn.layers.get_all_params(network)
     lr = theano.shared(nn.utils.floatX(1e-4)) # learning rate
     
-    if epoch ==1:
-        lr_g = theano.shared(nn.utils.floatX(1e-4))
-    #if epoch%5 == 0:
-        #lr_g = theano.shared(nn.utils.floatX(lr_g/epoch))
-    #updates = nn.updates.adam(loss,params, learning_rate=lr) # adam most widely used update scheme
 
+    lr_g = theano.shared(nn.utils.floatX(1e-10))
+    #if epoch%5 == 0
+        #lr_g = theano.shared(nn.utils.floatX(lr_g/epoch))
+    updates = nn.updates.adam(loss,params[0:len(params)], learning_rate=lr) # adam most widely used update scheme
+    '''
     gs = nn.layers.get_all_gs(network)
 
     gs_updates = g_updates(loss, params, gs, rand, lr_g)
-    #value = [gs_updates[gs[i]].get_value() for i in range (0,len(gs))]
 
     ## generate updates for params
     updates = OrderedDict()
@@ -109,20 +107,27 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     for i in range (0,len(gs)):
         print(i)
         gs_new = gs_updates[gs[i]]
+        #gs_new = gs[i]
         ws = params[i*2]
         [num_filters, num_channels, filter_size, filter_size] = ws.get_value().shape
         W = gabor_weight_update([num_filters, num_channels, filter_size, filter_size], gs_new)
         #updates[ws] = theano.shared(W)
-        updates[ws] = W
+        updates[ws] = ws
+        updates_old[ws] = ws
         updates[params[i*2+1]] = updates_old[params[i*2+1]]
         updates[gs[i]] = gs_new
-    
 
+    for j in range (2*len(gs),len(params)):
+        updates[params[j]] = updates_old[params[j]]
+
+    for j in range(0,len(gs)):
+        updates_old[gs[j]] = gs_updates[gs[i]]
+    '''
     start = timeit.default_timer()
     train_fn = theano.function([input_var, label_var], loss, updates=updates, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
     stop = timeit.default_timer()
     print(stop-start)
-
+    
     start = timeit.default_timer()
     test_fn = theano.function([input_var, label_var], test_loss, allow_input_downcast=True) #update weights, #allow_input_downcast for running 32-bit theano on 64-bit machine, might not need
     stop = timeit.default_timer()
@@ -140,16 +145,20 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
     log_file = 'log.txt'
     f = open(log_file, 'w')
 
-    while (epoch < 501):
+    done_looping = False
+    while (epoch < 201) and (not done_looping):
         train_err = run_epoch(train_input_new, train_label_new, train_fn, shape)
         test_err = run_epoch(test_input_var, test_label_var, test_fn, test_shape)
         print(test_err,train_err)
+        #gs = nn.layers.get_all_gs(network)
         f.write(str(test_err)+'\t'+str(train_err)+'\n')
-
+        #ps = nn.layers.get_all_param_values(network)
+        #print(ps[0][0,0,:,:])
         if test_err < best_test_err:
             best_test_err = test_err
             best_epoch = epoch
             best = [np.copy(p) for p in (nn.layers.get_all_param_values(network))]
+        
         '''
         if epoch%50 == 0:
             params_file='params_epoch_'+str(epoch)
@@ -157,8 +166,19 @@ def run_params(train_input_var, train_label_var, test_input_var, test_label_var)
                 pickle.dump(best, wr)
                 pass
             wr.close()
-	'''
+	    '''
+
         print('%d epoch finished' %(epoch))
+
+        if (epoch-best_epoch)>=10:
+            Dir = '/home/Documents/params_saving/'
+            params_file=Dir+'params_epoch_'+str(best_epoch)
+            with open(params_file, 'wb') as wr:
+                pickle.dump(best, wr)
+                pass
+            wr.close()
+            print("Best Validation Error is "+str(best_test_err))
+            done_looping = True
         epoch = epoch+1
 
         train_input_new, train_label_new = image_transform(train_input_var, train_label_var, shape)

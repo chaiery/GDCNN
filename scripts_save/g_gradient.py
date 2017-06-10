@@ -76,13 +76,13 @@ def g_theta(x,y,params):
 
 
 def g_f(x,y,params):
-    f,gamma,sigma,theta,psi = params[0],params[1],params[2],params[3],params[4],
-    xt = x*theano.tensor.cos(theta) + y*theano.tensor.sin(theta)
-    yt = -x*theano.tensor.sin(theta) + y*theano.tensor.cos(theta)
+    f,gamma,sigma,theta,psi = params
+    xt = x*np.cos(theta) + y*np.sin(theta)
+    yt = -x*np.sin(theta) + y*np.cos(theta)
     z1 = -(xt**2 + (gamma*yt)**2)/(2*sigma**2)
     z2 = 2*math.pi*f*xt+psi
-    value_1 = 2*f/(math.pi*gamma)*theano.tensor.exp(z1)*theano.tensor.cos(z2)
-    value_2 = -1*2*math.pi*xt*f**2/(math.pi*gamma)*theano.tensor.exp(z1)*theano.tensor.sin(z2)
+    value_1 = 2*f/(math.pi*gamma)*np.exp(z1)*np.cos(z2)
+    value_2 = -1*2*math.pi*xt*f**2/(math.pi*gamma)*np.exp(z1)*np.sin(z2)
 
     return value_1+value_2
 
@@ -118,20 +118,20 @@ def calculate_gradient_for_g(fn,g,size):
     y_range = np.linspace(-bond, bond, size)
 
     xt,yt = np.meshgrid(x_range,y_range)
-    a = fn(xt,yt,g).mean(dtype='float32')
+    a = fn(xt,yt,g).mean()
     return a
 
 
-def g_updates(loss, params, gs, rand, lr):
+def g_updates(loss, params, gs, rand, lr=0.001):
     gs_gradients = []
     gradients = nn.updates.get_or_compute_grads(loss, params)
     
-    for w_index in range (0, len(gs)):
+    for w_index in range (0, int(len(params)/2)):
         # First Loop
         # print(w_index)
         
         ws = params[w_index*2]
-        g_params = gs[w_index]
+        g_params = gs[w_index].get_value()
         ws_gradients = gradients[w_index*2]
 
         [num_filters, num_channels, filter_size, filter_size] = ws.get_value().shape
@@ -151,19 +151,14 @@ def g_updates(loss, params, gs, rand, lr):
         for i in range (0, num_filters):
             for j in range (0, num_channels):
                 g = g_params[i,j,:]
-                #additions.append(fn(0,0,g))
-                additions.append(calculate_gradient_for_g(fn,g,filter_size))
+                additions.append(fn(0,0,g))
+                #additions.append(calculate_gradient_for_g(fn,g,filter_size))
                 
-        additions = theano.tensor.stack(additions).reshape([num_filters,num_channels,-1])
+        additions =  np.array(additions,dtype=np.float32).reshape(num_filters,num_channels,-1)
         gp_list = np.array([ws_grad, ws_grad, ws_grad, ws_grad, ws_grad])*which_parameter
-        gp = theano.tensor.concatenate(np.ndarray.tolist(gp_list), axis=2)
-        gs_gradient = []
-        for i in range(0,num_filters):
-            for j in range(0,num_channels):
-                gs_gradient.append(gp[i,j,:]*additions[i,j,0])
-
-        gs_gradients.append(theano.tensor.concatenate(gs_gradient, axis=0).reshape([num_filters,num_channels,-1]))
-    gs_updates = nn.updates.sgd_dev(gs_gradients, gs, learning_rate=lr)
+        g_gradients = theano.tensor.concatenate(np.ndarray.tolist(gp_list), axis=2)*additions
+        gs_gradients.append(g_gradients)
+    gs_updates = nn.updates.adam_dev(gs_gradients, gs, learning_rate=lr)
     return gs_updates
 
 
@@ -176,7 +171,7 @@ def gabor_weight_update(shape, gs):
     for filter_index in range (0,num_filters):
         for channel_index in range (0,num_channels):
             
-            params = gs[filter_index, channel_index,:]
+            params = gs[filter_index, channel_index]
             g_params = [params[0],params[1],params[2],params[3],params[4]]
             
             bond = math.floor(size/2)

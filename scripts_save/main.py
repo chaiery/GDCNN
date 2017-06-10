@@ -14,11 +14,10 @@ for i in range (0,len(fnames)):
 	fnames[i] = 'image' + fnames[i] + '.png'
 
 
-index = fnames[1:1000]
+index = fnames[1:4000]
 random.shuffle(index)
-train_index = index[0:4000]
-
-test_index = fnames[4200:5000]
+train_index = index[0:1000]
+test_index = fnames[4000:4100]
 
 
 
