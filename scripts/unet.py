@@ -27,56 +27,7 @@ def sorenson_dice(pred, target):
     # 2 is just a scaling factor
     # add a number at end (20) to avoid dividing by 0
     return -2*T.sum(pred*target)/T.sum(pred+target+0.0001)
-
-def gabor_filter(x,y,w,theta,sigma):
-    xt = x*np.cos(theta) + y*np.sin(theta)
-    yt = -x*np.sin(theta) + y*np.cos(theta)
     
-    z1 = -(xt**2 + yt**2)/(2*sigma**2)
-    z2 = 1j*w*xt + w**2*sigma**2/2
-    value = (1/(2*math.pi*sigma**2)*np.exp(z1)*np.exp(z2)).real
-    value = value.astype(np.float32)
-    return value 
-
-
-def rescale(gfilter,mag):
-    mi = np.min(gfilter)
-    ma = np.max(gfilter)
-    factor = 0.3/max([ma,-mi])
-    return gfilter*factor
-
-
-def gabor32_filter_initiation(shape):
-    [num_filters,num_channels,size,size] = shape
-    number = num_filters*num_channels
-    Ws = []
-    gfilter = []
-    
-    gs = np.array([],dtype=np.float32).reshape(1,-1)
-    n = 8;
-    m = int(number/n);
-    
-    bond = math.floor(size/2)
-    x_range = np.linspace(-bond, bond, size)
-    y_range = np.linspace(-bond, bond, size)
-    xt,yt = np.meshgrid(x_range,y_range)
-    
-    for i in range (1,n+1):
-        for j in range (1,m+1):
-            w = (math.pi/2)*(2**0.5)**(-j+1)
-            theta = (i-1)*math.pi/8
-            sigma = math.pi/w
-
-            a = gabor_filter(xt,yt,w,theta,sigma).reshape(1,size,size)
-            #a = rescale(a,mag=0.3)
-            if len(gfilter)==0:
-                gfilter = a
-            else:
-                gfilter = np.concatenate((gfilter,a),axis=0)
-
-    Ws = gfilter.reshape(shape)
-            
-    return Ws
 
 def network(input_var, label_var, shape):
     layer = nn.layers.InputLayer(shape,input_var) #input layer (image size 116)

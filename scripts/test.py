@@ -7,7 +7,7 @@ from theano import tensor as T
 import unet
 
 size = (116, 116) 
-pred_path = '/home/spc/Dropbox/'
+pred_path = '/home/spc/Dropbox/Pred/'
 batch = 1000
 
 pkl_file = open('../fnames_collection_2', 'r')
