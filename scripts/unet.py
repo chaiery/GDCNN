@@ -43,7 +43,7 @@ def network(input_var, label_var, shape):
     layer = nn.layers.MaxPool2DLayer(layer, pool_size = 2) #56 (half of previous layer)
     
     #convolution layers (64 filters)
-    layer = nn.layers.Conv2DLayer(layer, num_filters = 64,filter_size = 7,
+    layer = nn.layers.Conv2DLayer(layer, num_filters =64,filter_size = 7,
                                   nonlinearity = nn.nonlinearities.rectify, pad='same') #52
 
     # max pool layer
@@ -58,19 +58,19 @@ def network(input_var, label_var, shape):
 
 
     #convolutional layers with 'full' pad
-    layer = nn.layers.Conv2DLayer(layer, num_filters = 64,filter_size = 7,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #26
+    #layer = nn.layers.Conv2DLayer(layer, num_filters = 64,filter_size = 7,
+    #                              nonlinearity = nn.nonlinearities.rectify, pad = 'same') #26
 
     #upscale layer
     layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #112    
 
     #convolutional layers with 'full' pad
-    layer = nn.layers.Conv2DLayer(layer, num_filters = 32,filter_size = 7,
-                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #56
+    #layer = nn.layers.Conv2DLayer(layer, num_filters = 32,filter_size = 7,
+    #                              nonlinearity = nn.nonlinearities.rectify, pad = 'same') #56
 
 
     #convolutional layers with 'full' pad
-    layer = nn.layers.Conv2DLayer(layer, num_filters = 1,filter_size = 7,
+    layer = nn.layers.Conv2DLayer(layer, num_filters = 1,filter_size = 7, 
                                   nonlinearity = nn.nonlinearities.sigmoid, pad = 'same') #116 
 
 

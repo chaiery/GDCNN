@@ -8,7 +8,7 @@ import unet
 
 size = (116, 116) 
 pred_path = '/home/spc/Dropbox/Pred/'
-batch = 1000
+batch = 100
 
 pkl_file = open('../fnames_collection_2', 'r')
 fnames = pkl_file.readline()
@@ -27,7 +27,7 @@ test_input, test_label= read_images(label_path, ori_path, test_index, size)
 
 
 
-pkl_file = open('/home/spc/Documents/params_saving/params_epoch_26_gabor7_fix', 'rb')
+pkl_file = open('/home/spc/Documents/params_saving/params_epoch_90', 'rb')
 params = pickle.load(pkl_file)
 
 input_var = T.tensor4('input_var')   # the data is presented as rasterized images
