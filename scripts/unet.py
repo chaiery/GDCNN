@@ -58,8 +58,8 @@ def network(input_var, label_var, shape):
 
 
     #convolutional layers with 'full' pad
-    #layer = nn.layers.Conv2DLayer(layer, num_filters = 64,filter_size = 7,
-    #                              nonlinearity = nn.nonlinearities.rectify, pad = 'same') #26
+    layer = nn.layers.Conv2DLayer(layer, num_filters = 64,filter_size = 7,
+                                  nonlinearity = nn.nonlinearities.rectify, pad = 'same') #26
 
     #upscale layer
     layer = nn.layers.Upscale2DLayer(layer, scale_factor = 2) #112    
